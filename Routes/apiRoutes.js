@@ -1,37 +1,21 @@
+const router = require("express").Router();
+const store = require("../db/store.js");
 
-
-let fs = require('fs');
-let util = require('util');
-let store = require('../db/store');
-// const path = require('path');
-let readFileAsync = util.promisify(fs.readFile);
-let writeFileAsync = util.promisify(fs.writeFile);
-
-
-module.exports = function(app) {
- 
-//get
-  app.get("/api/notes", function(req, res) {
-    store.getNotes().then((data) => {
-        return res.json(data);
-    });    
+// Route
+router.get("/notes", function(req, res) {
+    // 500 Error Message = Internal Server Error
+    store.getNotes().then(notes => res.json(notes)).catch(err => res.status(500).json(err));
 });
 
-//POST
+router.post("/notes", function (req, res) {
+    // Remember: the middleware in server.js grants access to req.body
+    store.addNote(req.body).then(note => res.json(note)).catch(err => res.status(500).json(err));
+});
 
-  app.post("/api/notes", function(req, res) {
-    store.addNote(req.body).then((note) => {
-        return res.json(note);
-    })
+// Parameter path syntax employs use of colon (:), req.params
+router.delete("/notes/:id", function(req, res) {
+    // ok: true for front end purposes
+    store.removeNote(req.params.id).then(() => res.json({ok: true})).catch(err => res.status(500).json(err));
+});
 
-  });
-
- //Delete
-
-  app.delete("/api/notes/:id", function(req, res) {
-   store.deleteNote(req.params.id).then(() => {
-       return res.json({ok:true});
-   })
-  });
-
-};
+module.exports = router;

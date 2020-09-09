@@ -1,23 +1,19 @@
-//dependencies
-const express = require('express');
-const path = require('path');
-
-// const fs = require('fs');
+// Dependencies
+const express = require("express");
+const apiRoutes = require("./routes/apiRoutes.js");
+const htmlRoutes = require("./routes/htmlRoutes");
 
 const app = express();
-let PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000;
 
-//Sets up express app to handle parsing
+// MIDDLEWARE filtering Client-Server communication (req.body)
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-app.use(express.static('public'));
+// Making Public Folder Static (Make Server Check Here First)
+app.use(express.static("public"));
+app.use("/api", apiRoutes);
+app.use("/", htmlRoutes);
 
-
-
-require("./Routes/apiRoutes")(app);
-require("./Routes/htmlRoutes")(app);
-
-app.listen(PORT, function() {
-    console.log("App listening on PORT " + PORT);
-});
+// Listening for Requests
+app.listen(PORT, () => console.log(`Listening on PORT ${PORT}.`));
